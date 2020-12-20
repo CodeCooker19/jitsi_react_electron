@@ -40,7 +40,7 @@ const useStyle = makeStyles((theme) => ({
         width: '400px',
         height: '100%',
         position: 'absolute',
-        left: '-100%',
+        left: '-400px',
         visibility: 'hide',
         transition: '0.6s',
         background: '#FFFFFF'
