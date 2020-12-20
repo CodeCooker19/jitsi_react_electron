@@ -8,6 +8,7 @@ import * as $ from 'jquery';
 import ControlArea from '../Components/ControlArea';
 import VideoNormalView from '../Components/VideoNormalView';
 import VideoSmallView from '../Components/RemoteSmallView/VideoSmallView';
+import ChatView from '../Components/ChatView/ChatView';
 import './conference.css';
 
 const useStyle = makeStyles((theme) => ({
@@ -409,7 +410,7 @@ const Conferences = (props) => {
                 <ControlArea onClickChat={handleClickChat} onClickCamera={handleClickCamera} onClickMic={handleClickMic} onClickCallEnd={handleCallEnd} onClickScreenShare={handleClickScreenShare} onClickHand={handleClickHand}/>
             </div>
             {
-                showChat ? <div className={classes.show_chat}>Hello What are you doing?</div> : 
+                showChat ? <div className={classes.show_chat}>Hello What are you doing?<ChatView /></div> : 
                             <div className={classes.hide_chat}>Hello What are you doing?</div>
             }
         </div>
