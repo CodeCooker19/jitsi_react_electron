@@ -410,8 +410,8 @@ const Conferences = (props) => {
                 <ControlArea onClickChat={handleClickChat} onClickCamera={handleClickCamera} onClickMic={handleClickMic} onClickCallEnd={handleCallEnd} onClickScreenShare={handleClickScreenShare} onClickHand={handleClickHand}/>
             </div>
             {
-                showChat ? <div className={classes.show_chat}>Hello What are you doing?<ChatView /></div> : 
-                            <div className={classes.hide_chat}>Hello What are you doing?</div>
+                showChat ? <div className={classes.show_chat}><ChatView /></div> : 
+                            <div className={classes.hide_chat}></div>
             }
         </div>
     )
