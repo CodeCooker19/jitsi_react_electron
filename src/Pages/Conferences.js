@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
-import {Drawer} from '@material-ui/core/';
+import { Drawer } from '@material-ui/core/';
 import { Link as RouterLink, withRouter } from 'react-router-dom';
 import * as $ from 'jquery';
 import ControlArea from '../Components/ControlArea';
@@ -10,7 +10,7 @@ import VideoNormalView from '../Components/VideoNormalView';
 import VideoSmallView from '../Components/RemoteSmallView/VideoSmallView';
 import ChatView from '../Components/ChatView/ChatView';
 import './conference.css';
-import { CropLandscapeOutlined } from '@material-ui/icons';
+import Str from '../constants/string';
 
 const useStyle = makeStyles((theme) => ({
     root: {
@@ -19,7 +19,7 @@ const useStyle = makeStyles((theme) => ({
         background: '#1d1d1d',
         width: '100%',
         height: '100%',
-        
+
     },
     control_area: {
         width: '100%',
@@ -56,7 +56,7 @@ const useStyle = makeStyles((theme) => ({
 
 const Conferences = (props) => {
     console.log(props)
-    const {history} = props;
+    const { history } = props;
     const classes = useStyle();
     const [showChat, setShowChat] = useState(false);
     const [remoteUserData, setRemoteUserData] = useState([]);
@@ -99,7 +99,7 @@ const Conferences = (props) => {
     }
 
     useEffect(() => {
-        if(window.JitsiMeetJS) {
+        if (window.JitsiMeetJS) {
             if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
                 console.log("enumerateDevices() not supported.");
                 return;
@@ -115,17 +115,17 @@ const Conferences = (props) => {
             connection.addEventListener(window.JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, disconnect);
             connection.connect();
 
-            
 
-            window.JitsiMeetJS.createLocalTracks({devices: ['audio', 'video']})
+
+            window.JitsiMeetJS.createLocalTracks({ devices: ['audio', 'video'] })
                 .then(onLocalTracks)
-                .catch(error=> {
+                .catch(error => {
                     console.log(error)
-            });
+                });
         }
     }, []);
 
-    const onConnectionSuccess = () => {        
+    const onConnectionSuccess = () => {
         room.current = connection.initJitsiConference(props.match.params.roomname, confOptions);
         room.current.on(window.JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrack);
         room.current.on(window.JitsiMeetJS.events.conference.TRACK_REMOVED, onRemoveTrack);
@@ -134,16 +134,16 @@ const Conferences = (props) => {
         room.current.on(window.JitsiMeetJS.events.conference.USER_JOINED, (id, user) => {
             let isFind = false;
             listRemouteUsers.map((cell, index) => {
-                if(cell.id === id) {
-                    cell.user = user; 
+                if (cell.id === id) {
+                    cell.user = user;
                     listRemouteUsers[index] = cell;
                     isFind = true;
                 }
             });
-            if(isFind) {
+            if (isFind) {
                 return;
             }
-            let new_user = {id: id, user: user};
+            let new_user = { id: id, user: user, isHand: false };
             listRemouteUsers.push(new_user);
         });
         room.current.on(window.JitsiMeetJS.events.conference.PARTICIPANT_PROPERTY_CHANGED, handleParticipantPropertyChange);
@@ -153,13 +153,13 @@ const Conferences = (props) => {
         });
         room.current.on(window.JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.log(`${userID} - ${displayName}`));
         room.current.on(window.JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, (userID, audioLevel) => console.log(`${userID} - ${audioLevel}`));
-        room.current.on(window.JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED,() => console.log(`${room.current.getPhoneNumber()} - ${room.current.getPhonePin()}`));
+        room.current.on(window.JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED, () => console.log(`${room.current.getPhoneNumber()} - ${room.current.getPhonePin()}`));
         room.current.on(window.JitsiMeetJS.events.conference.MESSAGE_RECEIVED, (id, text, ts) => onMessageReceived(id, text, ts));
         room.current.setDisplayName(props.match.params.name);
 
         room.current.join();
     }
-    
+
     /////////////////////////////////////// messages handler ///////////////////////////////////////
     const onMessageReceived = (id, text, ts) => {
         let message = {
@@ -174,9 +174,9 @@ const Conferences = (props) => {
     React.useEffect(() => {
     }, [messages])
     /////////////////////////////////////// messages handler ///////////////////////////////////////
-    
+
     const onConnectionFailed = (error) => {
-        console.error('Connection Failed!-' +  error);
+        console.error('Connection Failed!-' + error);
     }
 
     const disconnect = () => {
@@ -200,7 +200,7 @@ const Conferences = (props) => {
             localTrack.addEventListener(window.JitsiMeetJS.events.track.TRACK_AUDIO_OUTPUT_CHANGED,
                 deviceId =>
                     console.log(`track audio output device was changed to ${deviceId}`));
-            if (localTrack.getType() === 'video') {              
+            if (localTrack.getType() === 'video') {
                 localTrack.attach($(`#mainVideo`)[0]);
                 setLocalVideoTrack(localTrack);
             } else {
@@ -223,32 +223,33 @@ const Conferences = (props) => {
         const participant = track.getParticipantId();
         const type = track.getType();
         listRemoteUserData.map((remoteUser, index) => {
-            if(remoteUser.id === participant) {
-                if(type === 'video') {
+            if (remoteUser.id === participant) {
+                if (type === 'video') {
                     remoteUser.videotrack = track;
                     listRemoteUserData[index] = remoteUser;
-                } else if(type === 'audio') {
+                } else if (type === 'audio') {
                     remoteUser.audiotrack = track;
                     listRemoteUserData[index] = remoteUser;
                 }
                 isFind = true;
             }
         });
-        if(isFind === true) {
+        if (isFind === true) {
             setRemoteUserData([]);
             setRemoteUserData(listRemoteUserData);
             return;
         }
         console.log('tarck123-55555555555-' + participant);
-        let user_val = {id: participant, user: null, isHand: false, videotrack: [], audiotrack: []};
-        if(type === 'video') {
+        let user_val = { id: participant, user: null, isHand: false, videotrack: [], audiotrack: [] };
+        if (type === 'video') {
             user_val.videotrack = track;
-        } else if(type === 'audio') {
+        } else if (type === 'audio') {
             user_val.audiotrack = track;
         }
         listRemouteUsers.map((cell, index) => {
-            if(cell.id === participant) {
+            if (cell.id === participant) {
                 user_val.user = cell.user;
+                user_val.isHand = cell.isHand;
             }
         });
         listRemoteUserData.push(user_val);
@@ -261,7 +262,7 @@ const Conferences = (props) => {
         const participant = track.getParticipantId();
         const type = track.getType();
         listRemoteUserData.map((user, index) => {
-            if(user.id === participant && type === "video") {
+            if (user.id === participant && type === "video") {
                 console.log('remove-5555555555-' + participant);
                 listRemoteUserData.splice(index, 1);
                 track.detach($(`#${participant}video`)[0]);
@@ -271,7 +272,7 @@ const Conferences = (props) => {
         setRemoteUserData([]);
         setRemoteUserData(listRemoteUserData);
     }
-    
+
     const onChangeName = (id, displayName) => {
         console.log('changename-5555555555-' + id + '-' + displayName);
     }
@@ -294,36 +295,55 @@ const Conferences = (props) => {
             return;
         }
         const tracks = remoteTracks[id];
-    
+
         for (let i = 0; i < tracks.length; i++) {
             tracks[i].detach($(`#${id}${tracks[i].getType()}`));
         }
     }
 
     const handleParticipantPropertyChange = (participant, propertyName, oldValue, newValue) => {
-        let userData = [];
-        listRemoteUserData.map((remoteUser, index)=>{
-            if(remoteUser.id === participant.getId()) {
-                switch(propertyName) {
-                    case "raised-hand":
-                        listRemoteUserData[index].isHand = newValue;
-                        break;
-                    default:
-                        break;
-                }
+        if (newValue === Str.STR_NONE) {
+            return;
+        }
+
+        /* Raise hand message */
+        if (propertyName === Str.STR_RAISE_HAND) {
+            let flag;
+            switch (newValue) {
+                case Str.STR_HAND_UP:
+                    flag = true;
+                    break;
+                case Str.STR_HAND_DOWN:
+                    flag = false;
+                    break;
+                default:
+                    return;
             }
-            userData.push(remoteUser);
-        });
-        setRemoteUserData([]);
-        setRemoteUserData(listRemoteUserData);
+
+            listRemouteUsers.map((cell, index) => {
+                if (cell.id === participant.getId()) {
+                    cell.isHand = flag;
+                    return;
+                }
+            });
+
+            listRemoteUserData.map((remoteUser, index) => {
+                if (remoteUser.id === participant.getId()) {
+                    listRemoteUserData[index].isHand = flag;
+                    return;
+                }
+            });
+            setRemoteUserData([]);
+            setRemoteUserData(listRemoteUserData);
+        }
     }
-    
+
     const handleClickChat = () => {
         setShowChat(!showChat);
     }
 
     const handleClickCamera = () => {
-        if(localVideoTrack.isMuted()) {
+        if (localVideoTrack.isMuted()) {
             localVideoTrack.unmute();
         } else {
             localVideoTrack.mute();
@@ -331,7 +351,7 @@ const Conferences = (props) => {
     }
 
     const handleClickMic = () => {
-        if(localAudioTrack.isMuted()) {
+        if (localAudioTrack.isMuted()) {
             localAudioTrack.unmute();
         } else {
             localAudioTrack.mute();
@@ -339,14 +359,14 @@ const Conferences = (props) => {
     }
 
     useEffect(() => {
-        if(!isScreenShare.current && !isCamera.current) {
+        if (!isScreenShare.current && !isCamera.current) {
             return;
         }
 
         localVideoTrack.addEventListener(
             window.JitsiMeetJS.events.track.TRACK_MUTE_CHANGED,
             () => console.log('local track muted'));
-        if(isScreenShare.current) {
+        if (isScreenShare.current) {
             localVideoTrack.addEventListener(window.JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, showCamera);
         }
         localVideoTrack.attach($(`#mainVideo`)[0]);
@@ -361,14 +381,14 @@ const Conferences = (props) => {
         window.JitsiMeetJS.createLocalTracks({
             devices: ['video']
         })
-        .then(async tracks => {
-            if(localVideoTrack) {
-                await localVideoTrack.dispose();
-            }
-            setLocalVideoTrack(tracks[0]);
-        })
-        .catch(error => console.log(error));
-    } 
+            .then(async tracks => {
+                if (localVideoTrack) {
+                    await localVideoTrack.dispose();
+                }
+                setLocalVideoTrack(tracks[0]);
+            })
+            .catch(error => console.log(error));
+    }
 
     const handleClickScreenShare = () => {
         isScreenShare.current = true;
@@ -376,30 +396,36 @@ const Conferences = (props) => {
         window.JitsiMeetJS.createLocalTracks({
             devices: ['desktop']
         })
-        .then(async tracks => {
-            if(localVideoTrack) {
-                await localVideoTrack.dispose();
-            }
-            setLocalVideoTrack(tracks[0]);
-        })
-        .catch(error => console.log(error));
+            .then(async tracks => {
+                if (localVideoTrack) {
+                    await localVideoTrack.dispose();
+                }
+                setLocalVideoTrack(tracks[0]);
+            })
+            .catch(error => console.log(error));
     }
 
     const handleClickHand = () => {
-        room.current.setLocalParticipantProperty("raised-hand", !raiseHand);
+        room.current.setLocalParticipantProperty(Str.STR_RAISE_HAND, Str.STR_NONE);
+        if(!raiseHand){
+            room.current.setLocalParticipantProperty(Str.STR_RAISE_HAND, Str.STR_HAND_UP);
+        }
+        else{
+            room.current.setLocalParticipantProperty(Str.STR_RAISE_HAND, Str.STR_HAND_DOWN);
+        }
         setRaiseHand(!raiseHand);
     }
 
     const handleRemoveMainVideo = async () => {
-        if(localVideoTrack.length !== 0) {
+        if (localVideoTrack.length !== 0) {
             localVideoTrack.attach($(`#mainVideo`)[0]);
         } else {
-            
+
         }
     }
 
     function unload() {
-        if(localVideoTrack.length !== 0) {
+        if (localVideoTrack.length !== 0) {
             localVideoTrack.detach($(`#mainVideo`)[0]);
         }
 
@@ -421,17 +447,17 @@ const Conferences = (props) => {
         history.push('/');
     }
 
-    return(
-        <div  className={classes.root}>
+    return (
+        <div className={classes.root}>
             <div className={classes.video_area}>
-                <VideoNormalView localVideoTrack={localVideoTrack} remoteUsers={remoteUserData} isLocalHand={raiseHand} name={props.match.params.name} handleRemoveMainVideo={handleRemoveMainVideo}/>
+                <VideoNormalView localVideoTrack={localVideoTrack} remoteUsers={remoteUserData} isLocalHand={raiseHand} name={props.match.params.name} handleRemoveMainVideo={handleRemoveMainVideo} />
             </div>
             <div className={classes.control_area}>
-                <ControlArea onClickChat={handleClickChat} onClickCamera={handleClickCamera} onClickMic={handleClickMic} onClickCallEnd={handleCallEnd} onClickScreenShare={handleClickScreenShare} onClickHand={handleClickHand}/>
+                <ControlArea onClickChat={handleClickChat} onClickCamera={handleClickCamera} onClickMic={handleClickMic} onClickCallEnd={handleCallEnd} onClickScreenShare={handleClickScreenShare} onClickHand={handleClickHand} />
             </div>
             {
-                showChat ? <div className={classes.show_chat}><ChatView messages={messages} /></div> : 
-                            <div className={classes.hide_chat}></div>
+                showChat ? <div className={classes.show_chat}><ChatView messages={messages} /></div> :
+                    <div className={classes.hide_chat}></div>
             }
         </div>
     )
