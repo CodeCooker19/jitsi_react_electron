@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme) => ({
   messageContainer: {
     height: 'calc(100% - 66px)',
     overflowY: 'scroll',
+    position: 'relative',
   },
   messageArea: {
     display: 'flex',
@@ -75,25 +76,25 @@ const useStyles = makeStyles((theme) => ({
 
 // main function
 const ChatView = (props) => {
-  const { messages } = props
+  const { messages, getMyMessage } = props
   const classes = useStyles();
 
   const [text, setText] = useState("");
 
   function handleOnEnter(text) {
-    console.log("enter", text);
+    getMyMessage(text);
   }
 
   return (
     <div className={classes.root}>
-      <div className={classes.messageContainer}>
+      <div id="chatConversation" className={classes.messageContainer}>
         {messages.map((message, index) => {
           return (
             <div key={index} className={classes.messageArea}>
               <img src={UserAvatar} className={classes.avatar} alt="..." />
               <div className={classes.flexStart}>
                 <div className={classes.username}>
-                  {message.user._displayName}
+                  {message.user}
                 </div>
                 <div className={classes.time}>
                   {message.ts}
