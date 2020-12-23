@@ -162,8 +162,10 @@ const Conferences = (props) => {
     
     /////////////////////////////////////// messages handler ///////////////////////////////////////
     const onMessageReceived = (id, text, ts) => {
+        let name;
+        name = listRemouteUsers.find(x => x.id === id) === undefined ? props.match.params.name : listRemouteUsers.find(x => x.id === id).user._displayName
         let message = {
-            user: room.current.getParticipantById(id),
+            user: name,
             id: id,
             text: text,
             ts: ts,
@@ -173,6 +175,10 @@ const Conferences = (props) => {
 
     React.useEffect(() => {
     }, [messages])
+
+    const handleGetMyMessage = (text) => {
+        room.current.sendTextMessage(text);
+    }
     /////////////////////////////////////// messages handler ///////////////////////////////////////
     
     const onConnectionFailed = (error) => {
@@ -430,7 +436,7 @@ const Conferences = (props) => {
                 <ControlArea onClickChat={handleClickChat} onClickCamera={handleClickCamera} onClickMic={handleClickMic} onClickCallEnd={handleCallEnd} onClickScreenShare={handleClickScreenShare} onClickHand={handleClickHand}/>
             </div>
             {
-                showChat ? <div className={classes.show_chat}><ChatView messages={messages} /></div> : 
+                showChat ? <div className={classes.show_chat}><ChatView messages={messages} getMyMessage={handleGetMyMessage} /></div> : 
                             <div className={classes.hide_chat}></div>
             }
         </div>
