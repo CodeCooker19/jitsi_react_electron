@@ -77,15 +77,27 @@ const Conferences = (props) => {
     // message
     const [messages, setMessages] = React.useState([]);
 
+    // const options = {
+    //     serviceUrl: 'wss://beta.meet.jit.si/xmpp-websocket',
+    //     hosts: {
+    //         domain: 'beta.meet.jit.si',
+    //         muc: 'conference.beta.meet.jit.si', // FIXME: use XEP-0030
+    //         // focus: 'focus.meet.jit.si',
+    //     },
+    //     bosh: 'https://beta.meet.jit.si/http-bind', // FIXME: use xep-0156 for that
+    //     clientNode: "https://beta.jitsi.org/jitsimeet",
+    //     useStunTurn: true
+    // };
+
     const options = {
-        serviceUrl: 'wss://beta.meet.jit.si/xmpp-websocket',
+        // serviceUrl: 'wss://js1.appstractor.com/xmpp-websocket',
         hosts: {
-            domain: 'beta.meet.jit.si',
-            muc: 'conference.beta.meet.jit.si', // FIXME: use XEP-0030
-            // focus: 'focus.meet.jit.si',
+            domain: 'js1.appstractor.com',
+            muc: 'conference.js1.appstractor.com', // FIXME: use XEP-0030
+            // focus: 'focus.meet.jit.si',
         },
-        bosh: 'https://beta.meet.jit.si/http-bind', // FIXME: use xep-0156 for that
-        clientNode: "https://beta.jitsi.org/jitsimeet",
+        bosh: 'https://js1.appstractor.com/http-bind', // FIXME: use xep-0156 for that
+        clientNode: "https://jitsi.org/jitsimeet",
         useStunTurn: true
     };
 
@@ -388,10 +400,12 @@ const Conferences = (props) => {
             devices: ['video']
         })
             .then(async tracks => {
-                if (localVideoTrack) {
-                    await localVideoTrack.dispose();
+                if (tracks.length > 0) {
+                    if (localVideoTrack) {
+                        await localVideoTrack.dispose();
+                    }
+                    setLocalVideoTrack(tracks[0]);
                 }
-                setLocalVideoTrack(tracks[0]);
             })
             .catch(error => console.log(error));
     }
@@ -403,20 +417,22 @@ const Conferences = (props) => {
             devices: ['desktop']
         })
             .then(async tracks => {
-                if (localVideoTrack) {
-                    await localVideoTrack.dispose();
+                if (tracks.length > 0) {
+                    if (localVideoTrack) {
+                        await localVideoTrack.dispose();
+                    }
+                    setLocalVideoTrack(tracks[0]);
                 }
-                setLocalVideoTrack(tracks[0]);
             })
             .catch(error => console.log(error));
     }
 
     const handleClickHand = () => {
         room.current.setLocalParticipantProperty(Str.STR_RAISE_HAND, Str.STR_NONE);
-        if(!raiseHand){
+        if (!raiseHand) {
             room.current.setLocalParticipantProperty(Str.STR_RAISE_HAND, Str.STR_HAND_UP);
         }
-        else{
+        else {
             room.current.setLocalParticipantProperty(Str.STR_RAISE_HAND, Str.STR_HAND_DOWN);
         }
         setRaiseHand(!raiseHand);
@@ -462,8 +478,8 @@ const Conferences = (props) => {
                 <ControlArea onClickChat={handleClickChat} onClickCamera={handleClickCamera} onClickMic={handleClickMic} onClickCallEnd={handleCallEnd} onClickScreenShare={handleClickScreenShare} onClickHand={handleClickHand} />
             </div>
             {
-                showChat ? <div className={classes.show_chat}><ChatView messages={messages} getMyMessage={handleGetMyMessage} /></div> : 
-                            <div className={classes.hide_chat}></div>
+                showChat ? <div className={classes.show_chat}><ChatView messages={messages} getMyMessage={handleGetMyMessage} /></div> :
+                    <div className={classes.hide_chat}></div>
             }
         </div>
     )

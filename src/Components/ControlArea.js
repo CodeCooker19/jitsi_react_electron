@@ -105,7 +105,6 @@ const ControlArea = (props) => {
     return(
         <div className={classes.root}>
             <ChatBubbleOutlineIcon className={classes.style_chat} onClick={()=>props.onClickChat()} />
-            <PanToolIcon className={classes.style_hand} onClick={()=>props.onClickHand()}/>
             <div className={classes.white_circle} onClick={onClickMic} >
                 { mic ? <MicIcon className={classes.styles_icon_device}/> : <MicOffIcon className={classes.styles_icon_device}/> }
             </div>
@@ -115,8 +114,9 @@ const ControlArea = (props) => {
             <div className={classes.white_circle} onClick={onClickCam} >
                 { cam ?  <VideocamIcon className={classes.styles_icon_device}/> : <VideocamOffIcon className={classes.styles_icon_device}/>}
             </div>
-            <ScreenShareIcon className={classes.style_screenshare} onClick={()=>props.onClickScreenShare()}/>
-            <AppsIcon className={classes.style_multiview} />
+            <PanToolIcon className={classes.style_hand} onClick={()=>props.onClickHand()}/>
+            {/* <ScreenShareIcon className={classes.style_screenshare} onClick={()=>props.onClickScreenShare()}/>
+            <AppsIcon className={classes.style_multiview} /> */}
         </div>
     )
 

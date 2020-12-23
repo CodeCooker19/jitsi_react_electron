@@ -49,7 +49,7 @@ export default class VideoSmallView extends Component {
             <div id={'div' + this.state.video_tag_id} className="root" onMouseOver={this.handleMouseOver} onMouseLeave={this.handleMouseLeave} onClick={this.handleClickSmallVideo}>
                 <video className="video" autoPlay='1' id={this.state.video_tag_id} playsInline height='150' width='200' />  
                 <div className="div-avatar">
-                    <Avatar className="avatar">{this.state.user_name.charAt(0).toUpperCase()}</Avatar>
+                    <Avatar className="avatar">{this.state.user_name == undefined ? "" : this.state.user_name.charAt(0).toUpperCase()}</Avatar>
                 </div> 
                 <PanToolIcon className={this.state.ishand ? "hand show" : "hand hide"} />             
                 <div className={this.state.overView ? "over_div_show" : "over_div_hide"} >
