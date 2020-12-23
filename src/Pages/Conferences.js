@@ -8,7 +8,9 @@ import * as $ from 'jquery';
 import ControlArea from '../Components/ControlArea';
 import VideoNormalView from '../Components/VideoNormalView';
 import VideoSmallView from '../Components/RemoteSmallView/VideoSmallView';
+import ChatView from '../Components/ChatView/ChatView';
 import './conference.css';
+import { CropLandscapeOutlined } from '@material-ui/icons';
 
 const useStyle = makeStyles((theme) => ({
     root: {
@@ -53,6 +55,7 @@ const useStyle = makeStyles((theme) => ({
 }));
 
 const Conferences = (props) => {
+    console.log(props)
     const {history} = props;
     const classes = useStyle();
     const [showChat, setShowChat] = useState(false);
@@ -71,6 +74,8 @@ const Conferences = (props) => {
     let connection = null;
     let remoteTracks = {};
     let isVideo = false;
+    // message
+    const [messages, setMessages] = React.useState([]);
 
     const options = {
         serviceUrl: 'wss://beta.meet.jit.si/xmpp-websocket',
@@ -149,11 +154,27 @@ const Conferences = (props) => {
         room.current.on(window.JitsiMeetJS.events.conference.DISPLAY_NAME_CHANGED, (userID, displayName) => console.log(`${userID} - ${displayName}`));
         room.current.on(window.JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, (userID, audioLevel) => console.log(`${userID} - ${audioLevel}`));
         room.current.on(window.JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED,() => console.log(`${room.current.getPhoneNumber()} - ${room.current.getPhonePin()}`));
+        room.current.on(window.JitsiMeetJS.events.conference.MESSAGE_RECEIVED, (id, text, ts) => onMessageReceived(id, text, ts));
         room.current.setDisplayName(props.match.params.name);
 
         room.current.join();
     }
+    
+    /////////////////////////////////////// messages handler ///////////////////////////////////////
+    const onMessageReceived = (id, text, ts) => {
+        let message = {
+            user: room.current.getParticipantById(id),
+            id: id,
+            text: text,
+            ts: ts,
+        }
+        setMessages(messages => [...messages, message]);
+    }
 
+    React.useEffect(() => {
+    }, [messages])
+    /////////////////////////////////////// messages handler ///////////////////////////////////////
+    
     const onConnectionFailed = (error) => {
         console.error('Connection Failed!-' +  error);
     }
@@ -409,8 +430,8 @@ const Conferences = (props) => {
                 <ControlArea onClickChat={handleClickChat} onClickCamera={handleClickCamera} onClickMic={handleClickMic} onClickCallEnd={handleCallEnd} onClickScreenShare={handleClickScreenShare} onClickHand={handleClickHand}/>
             </div>
             {
-                showChat ? <div className={classes.show_chat}>Hello What are you doing?</div> : 
-                            <div className={classes.hide_chat}>Hello What are you doing?</div>
+                showChat ? <div className={classes.show_chat}><ChatView messages={messages} /></div> : 
+                            <div className={classes.hide_chat}></div>
             }
         </div>
     )
