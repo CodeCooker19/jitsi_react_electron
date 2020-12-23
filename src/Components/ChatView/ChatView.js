@@ -75,6 +75,7 @@ const useStyles = makeStyles((theme) => ({
 
 // main function
 const ChatView = (props) => {
+  const { messages } = props
   const classes = useStyles();
 
   const [text, setText] = useState("");
@@ -86,40 +87,24 @@ const ChatView = (props) => {
   return (
     <div className={classes.root}>
       <div className={classes.messageContainer}>
-        <div className={classes.messageArea}>
-          <img src={UserAvatar} className={classes.avatar} alt="..." />
-          <div className={classes.flexStart}>
-            <div className={classes.username}>
-              Friend Name
-          </div>
-            <div className={classes.time}>
-              18:03
-          </div>
-            <div className={classes.message}>
-              This is a friend's test message
-          </div>
-            <div className={classes.message}>
-              This is a friend's test message
-          </div>
-          </div>
-        </div>
-        <div className={classes.messageArea}>
-          <img src={MineAvatar} className={classes.avatar} alt="..." />
-          <div className={classes.flexStart}>
-            <div className={classes.username}>
-              My Name
-          </div>
-            <div className={classes.time}>
-              18:04
-          </div>
-            <div className={classes.message}>
-              This is my test message
-          </div>
-            <div className={classes.message}>
-              This is my test message
-          </div>
-          </div>
-        </div>
+        {messages.map((message, index) => {
+          return (
+            <div key={index} className={classes.messageArea}>
+              <img src={UserAvatar} className={classes.avatar} alt="..." />
+              <div className={classes.flexStart}>
+                <div className={classes.username}>
+                  {message.user._displayName}
+                </div>
+                <div className={classes.time}>
+                  {message.ts}
+                </div>
+                <div className={classes.message}>
+                  {message.text}
+                </div>
+              </div>
+            </div>
+          )
+        })}
       </div>
       <div className={classes.emojiTextArea}>
         <InputEmoji
