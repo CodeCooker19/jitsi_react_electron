@@ -78,12 +78,21 @@ const useStyles = makeStyles((theme) => ({
 const ChatView = (props) => {
   const { messages, getMyMessage } = props
   const classes = useStyles();
+  const messagesEnd = React.useRef()
 
   const [text, setText] = useState("");
 
   function handleOnEnter(text) {
     getMyMessage(text);
   }
+
+  const scrollToBottom = () => {
+    messagesEnd.current.scrollIntoView({ behavior: "smooth" });
+  }
+  
+  React.useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   return (
     <div className={classes.root}>
@@ -106,6 +115,7 @@ const ChatView = (props) => {
             </div>
           )
         })}
+        <div className={classes.message} ref={messagesEnd} />
       </div>
       <div className={classes.emojiTextArea}>
         <InputEmoji
