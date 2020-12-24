@@ -9,7 +9,8 @@ export default class VideoSmallView extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { track: this.props.track, video_tag_id: this.props.video_tag_id, user_name: this.props.user_name, ishand: this.props.ishand, overView: false };
+        this.state = { track: this.props.track, user_name: this.props.user_name, ishand: this.props.ishand, overView: false };
+        // this.state = { track: this.props.track, video_tag_id: this.props.video_tag_id, user_name: this.props.user_name, ishand: this.props.ishand, overView: false };
         this.handleMouseOver = this.handleMouseOver.bind(this);
         this.handleMouseLeave = this.handleMouseLeave.bind(this);
         this.handleClickSmallVideo = this.handleClickSmallVideo.bind(this);
@@ -28,26 +29,14 @@ export default class VideoSmallView extends Component {
     }
     handleClickSmallVideo() {
         if (this.state.track !== null) {
-            this.state.track.attach($(`#mainVideo`)[0]);
-        }
-    }
-
-    componentDidMount() {
-        if (this.state.track !== null) {
-            this.state.track.attach($(`#${this.state.video_tag_id}`)[0]);
-        }
-    }
-
-    componentWillUnmount() {
-        if (this.state.track !== null) {
-            this.state.track.detach($(`#${this.state.video_tag_id}`)[0]);
+            // this.state.track.attach($(`#mainVideo`)[0]);
         }
     }
 
     render() {
         return (
-            <div style={{ cursor: 'pointer' }} id={'div' + this.state.video_tag_id} className="root" onMouseOver={this.handleMouseOver} onMouseLeave={this.handleMouseLeave} onClick={this.handleClickSmallVideo}>
-                <video className="video" autoPlay='1' id={this.state.video_tag_id} playsInline height='150' width='200' />
+            <div style={{ cursor: 'pointer' }} id='div' className="root" onMouseOver={this.handleMouseOver} onMouseLeave={this.handleMouseLeave} onClick={this.handleClickSmallVideo} onClick={this.handleClickSmallVideo}>
+                {/* <video className="video" autoPlay='1' playsInline height='150' width='200' /> */}
                 <div className="div-avatar">
                     <Avatar className="avatar">{this.state.user_name == undefined ? "" : this.state.user_name.charAt(0).toUpperCase()}</Avatar>
                 </div>
