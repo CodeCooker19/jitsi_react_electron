@@ -29,14 +29,13 @@ export default class VideoSmallView extends Component {
     }
     handleClickSmallVideo() {
         if (this.state.track !== null) {
-            // this.state.track.attach($(`#mainVideo`)[0]);
+            $(`#mainVideo`)[0].srcObject = null;
         }
     }
 
     render() {
         return (
             <div style={{ cursor: 'pointer' }} id='div' className="root" onMouseOver={this.handleMouseOver} onMouseLeave={this.handleMouseLeave} onClick={this.handleClickSmallVideo} onClick={this.handleClickSmallVideo}>
-                {/* <video className="video" autoPlay='1' playsInline height='150' width='200' /> */}
                 <div className="div-avatar">
                     <Avatar className="avatar">{this.state.user_name == undefined ? "" : this.state.user_name.charAt(0).toUpperCase()}</Avatar>
                 </div>
