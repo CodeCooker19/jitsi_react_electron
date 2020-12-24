@@ -55,10 +55,10 @@ const useStyle = makeStyles((theme) => ({
 }));
 
 const Conferences = (props) => {
-    console.log(props)
     const { history } = props;
     const classes = useStyle();
     const [showChat, setShowChat] = useState(false);
+    const [remoteUsers, setRemoteUsers] = useState([]);
     const [remoteUserData, setRemoteUserData] = useState([]);
     const [localVideoTrack, setLocalVideoTrack] = useState([]);
     const [localAudioTrack, setLocalAudioTrack] = useState([]);
@@ -67,9 +67,8 @@ const Conferences = (props) => {
     const isCamera = React.useRef(false);
     const room = React.useRef(null);
     let listRemoteUserData = [];
-    let listRemouteUsers = [];
+    let listRemoteUsers = [];
     let localTracks = [];
-    // let room = React.useRef(null);
     let isJoined = false;
     let connection = null;
     let remoteTracks = {};
@@ -145,10 +144,10 @@ const Conferences = (props) => {
         room.current.on(window.JitsiMeetJS.events.conference.CONFERENCE_JOINED, onConferenceJoined);
         room.current.on(window.JitsiMeetJS.events.conference.USER_JOINED, (id, user) => {
             let isFind = false;
-            listRemouteUsers.map((cell, index) => {
+            listRemoteUsers.map((cell, index) => {
                 if (cell.id === id) {
                     cell.user = user;
-                    listRemouteUsers[index] = cell;
+                    listRemoteUsers[index] = cell;
                     isFind = true;
                 }
             });
@@ -156,7 +155,8 @@ const Conferences = (props) => {
                 return;
             }
             let new_user = { id: id, user: user, isHand: false };
-            listRemouteUsers.push(new_user);
+            listRemoteUsers.push(new_user);
+            setRemoteUsers(listRemoteUsers);
         });
         room.current.on(window.JitsiMeetJS.events.conference.PARTICIPANT_PROPERTY_CHANGED, handleParticipantPropertyChange);
         room.current.on(window.JitsiMeetJS.events.conference.USER_LEFT, onUserLeft);
@@ -175,7 +175,7 @@ const Conferences = (props) => {
     /////////////////////////////////////// messages handler ///////////////////////////////////////
     const onMessageReceived = (id, text, ts) => {
         let name;
-        name = listRemouteUsers.find(x => x.id === id) === undefined ? props.match.params.name : listRemouteUsers.find(x => x.id === id).user._displayName
+        name = listRemoteUsers.find(x => x.id === id) === undefined ? props.match.params.name : listRemoteUsers.find(x => x.id === id).user._displayName
         let message = {
             user: name,
             id: id,
@@ -264,7 +264,7 @@ const Conferences = (props) => {
         } else if (type === 'audio') {
             user_val.audiotrack = track;
         }
-        listRemouteUsers.map((cell, index) => {
+        listRemoteUsers.map((cell, index) => {
             if (cell.id === participant) {
                 user_val.user = cell.user;
                 user_val.isHand = cell.isHand;
@@ -338,7 +338,7 @@ const Conferences = (props) => {
                     return;
             }
 
-            listRemouteUsers.map((cell, index) => {
+            listRemoteUsers.map((cell, index) => {
                 if (cell.id === participant.getId()) {
                     cell.isHand = flag;
                     return;
@@ -361,18 +361,22 @@ const Conferences = (props) => {
     }
 
     const handleClickCamera = () => {
-        if (localVideoTrack.isMuted()) {
-            localVideoTrack.unmute();
-        } else {
-            localVideoTrack.mute();
+        if (localVideoTrack.length !== 0) {
+            if (localVideoTrack.isMuted()) {
+                localVideoTrack.unmute();
+            } else {
+                localVideoTrack.mute();
+            }
         }
     }
 
     const handleClickMic = () => {
-        if (localAudioTrack.isMuted()) {
-            localAudioTrack.unmute();
-        } else {
-            localAudioTrack.mute();
+        if (localAudioTrack.length !== 0) {
+            if (localAudioTrack.isMuted()) {
+                localAudioTrack.unmute();
+            } else {
+                localAudioTrack.mute();
+            }
         }
     }
 
@@ -472,7 +476,7 @@ const Conferences = (props) => {
     return (
         <div className={classes.root}>
             <div className={classes.video_area}>
-                <VideoNormalView localVideoTrack={localVideoTrack} remoteUsers={remoteUserData} isLocalHand={raiseHand} name={props.match.params.name} handleRemoveMainVideo={handleRemoveMainVideo} />
+                <VideoNormalView localVideoTrack={localVideoTrack} remoteUsers={remoteUsers} remoteUsersData={remoteUserData} isLocalHand={raiseHand} name={props.match.params.name} handleRemoveMainVideo={handleRemoveMainVideo} />
             </div>
             <div className={classes.control_area}>
                 <ControlArea onClickChat={handleClickChat} onClickCamera={handleClickCamera} onClickMic={handleClickMic} onClickCallEnd={handleCallEnd} onClickScreenShare={handleClickScreenShare} onClickHand={handleClickHand} />
