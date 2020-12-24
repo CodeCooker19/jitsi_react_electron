@@ -1,6 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import VideoSmallView from './RemoteSmallView/VideoSmallView';
+import VideoSmallViewEmpty from './RemoteSmallView/VideoSmallViewEmpty';
 import AudioSmallView from './RemoteSmallView/AudioSmallView';
 import Avatar from '@material-ui/core/Avatar';
 import * as $ from 'jquery';
@@ -14,7 +15,6 @@ const useStyles = makeStyles((theme) => ({
     main_video: {
         height: '100%',
         width: '100%',
-        // transform: 'scaleX(-1)',
         objectFit: 'cover'
     },
     div_video_list: {
@@ -32,7 +32,6 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flex: 1,
         flexDirection: 'column',
-        
     },
     div_avatar: {
         width: '100%',
@@ -51,42 +50,64 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const VideoNormalView = (props) => {
-    const {localVideoTrack, isLocalHand, remoteUsers, name} = props;
+    const { localVideoTrack, isLocalHand, remoteUsers, remoteUsersData, name } = props;
+
+    let tempRemoteUsersData = [];
+    tempRemoteUsersData = remoteUsersData;
+    for (let i = 0; i < remoteUsers.length; i++) {
+        let count = 0;
+        for (let k = 0; k < tempRemoteUsersData.length; k++) {
+            if (remoteUsers[i].id === tempRemoteUsersData[k].id) {
+                count++;
+            }
+        }
+        if (count === 0) {
+            tempRemoteUsersData.push(remoteUsers[i]);
+        }
+    }
     const classes = useStyles();
 
-    const addSmallVideo = (data) => {
-        return(
-            <VideoSmallView key={data.videotrack.getParticipantId() + data.videotrack.getType()} track={data.videotrack} video_tag_id={data.videotrack.getParticipantId() + data.videotrack.getType()} user_name={data.user !== null? data.user.getDisplayName() : ''} ishand={data.isHand} />
-        );
+    const addSmallVideo = (data, index) => {
+        if (data.videotrack !== undefined) {
+            return (
+                <VideoSmallView key={data.videotrack.getParticipantId() + data.videotrack.getType()} track={data.videotrack} video_tag_id={data.videotrack.getParticipantId() + data.videotrack.getType()} user_name={data.user !== null ? data.user.getDisplayName() : ''} ishand={data.isHand} />
+            )
+        } else {
+            return (
+                <VideoSmallViewEmpty key={index} user_name={data.user !== null ? data.user.getDisplayName() : ''} ishand={data.isHand} />
+            );
+        }
     }
 
     const addSmallAudio = (data) => {
-        return(
-            <AudioSmallView key={data.audiotrack.getParticipantId() + data.audiotrack.getType()} track={data.audiotrack} audio_tag_id={data.audiotrack.getParticipantId() + data.audiotrack.getType()}/>
-        )
+        if (data.videotrack !== undefined) {
+            return (
+                <AudioSmallView key={data.audiotrack.getParticipantId() + data.audiotrack.getType()} track={data.audiotrack} audio_tag_id={data.audiotrack.getParticipantId() + data.audiotrack.getType()} />
+            )
+        }
     }
-    
-    return(
+
+    return (
         <div className={classes.root}>
             <div className={classes.div_avatar}>
                 <Avatar className={classes.avatar}>{name.charAt(0).toUpperCase()}</Avatar>
             </div>
-            <video className={classes.main_video} autoPlay='1' id='mainVideo' playsInline onSuspend={()=>props.handleRemoveMainVideo()}/>
+            <video className={classes.main_video} autoPlay='1' id='mainVideo' playsInline onSuspend={() => props.handleRemoveMainVideo()} />
             <audio autoPlay='1' muted='1' id='mainAudio' />
             <div className={classes.div_video_list} >
                 <div id='divLocalSmallVideo'>
-                    {localVideoTrack.length === 0 ? null : <VideoSmallView track={localVideoTrack} video_tag_id='localSmallVideo' user_name={name} ishand={isLocalHand} />}
+                    {localVideoTrack.length === 0 ? <VideoSmallViewEmpty video_tag_id='localSmallVideo' user_name={name} ishand={isLocalHand} /> : <VideoSmallView track={localVideoTrack} video_tag_id='localSmallVideo' user_name={name} ishand={isLocalHand} />}
                 </div>
                 <audio autoPlay='1' muted='1' id='localSmallAudio' />
                 <div className={classes.div_remote_videos} id='remoteVideos'>
-                    {remoteUsers.map((remoteUser, index) => (
-                        remoteUser.videotrack.length === 0 ? null : addSmallVideo(remoteUser)
+                    {tempRemoteUsersData.map((remoteUserData, index) => (
+                        remoteUserData.videotrack !== undefined && remoteUserData.videotrack.length === 0 ? null : addSmallVideo(remoteUserData)
                     ))}
-                    {remoteUsers.map((remoteUser, index) => (
-                        remoteUser.audiotrack.length === 0 ? null : addSmallAudio(remoteUser)
+                    {tempRemoteUsersData.map((remoteUserData, index) => (
+                        remoteUserData.videotrack !== undefined && remoteUserData.audiotrack.length === 0 ? null : addSmallAudio(remoteUserData)
                     ))}
                 </div>
-             </div>
+            </div>
         </div>
     )
 }
