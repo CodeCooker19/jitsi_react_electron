@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import VideoSmallView from './RemoteSmallView/VideoSmallView';
-import VideoSmallViewEmpty from './RemoteSmallView/VideoSmallViewEmpty';
 import AudioSmallView from './RemoteSmallView/AudioSmallView';
 import Avatar from '@material-ui/core/Avatar';
 import * as $ from 'jquery';
@@ -74,7 +73,7 @@ const VideoNormalView = (props) => {
             )
         } else {
             return (
-                <VideoSmallViewEmpty key={index} user_name={data.user !== null ? data.user.getDisplayName() : ''} ishand={data.isHand} />
+                <VideoSmallView key={index} user_name={data.user !== null ? data.user.getDisplayName() : ''} ishand={data.isHand} />
             );
         }
     }
@@ -96,7 +95,7 @@ const VideoNormalView = (props) => {
             <audio autoPlay='1' muted='1' id='mainAudio' />
             <div className={classes.div_video_list} >
                 <div id='divLocalSmallVideo'>
-                    {localVideoTrack.length === 0 ? <VideoSmallViewEmpty video_tag_id='localSmallVideo' user_name={name} ishand={isLocalHand} /> : <VideoSmallView track={localVideoTrack} video_tag_id='localSmallVideo' user_name={name} ishand={isLocalHand} />}
+                    {localVideoTrack.length === 0 ? <VideoSmallView key='empty-camera' video_tag_id='localSmallVideo' user_name={name} ishand={isLocalHand} /> : <VideoSmallView track={localVideoTrack} video_tag_id='localSmallVideo' user_name={name} ishand={isLocalHand} />}
                 </div>
                 <audio autoPlay='1' muted='1' id='localSmallAudio' />
                 <div className={classes.div_remote_videos} id='remoteVideos'>
