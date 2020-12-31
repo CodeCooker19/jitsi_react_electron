@@ -1,21 +1,19 @@
 const electron = require('electron');
 const { dialog } = require('electron')
-const { app, BrowserWindow } = electron;
+const { app, BrowserWindow, Menu, Tray } = electron;
 const URL = require('url');
 const path = require('path');
 const isDev = require('electron-is-dev');
 
 let mainWindow = null;
-
-// app.on('ready', createWindow);
+let tray = null;
 
 app.on('ready', () => {
-
   // create a new `splash`-Window 
   splash = new BrowserWindow({
     transparent: true,
     frame: false,
-    title: "Jitsi Electron Sample",
+    title: "Jitsi Meet Desktop Demo",
     icon: __dirname + '/images/production_mark.ico',
   });
 
@@ -26,9 +24,9 @@ app.on('ready', () => {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 900,
-    minWidth: 1200,
-    minHeight: 900,
-    title: "Jitsi Electron Sample",
+    minWidth: 400,
+    minHeight: 300,
+    title: "Jitsi Meet Desktop Demo",
     icon: __dirname + '/images/production_mark.ico',
     show: false
   });
@@ -49,6 +47,23 @@ app.on('ready', () => {
     mainWindow.maximize();
     mainWindow.show();
   });
+
+  //Tray icon
+  tray = new Tray(path.join(__dirname, '/images/production_mark.ico'));
+
+  if (process.platform === 'win32') {
+    tray.on('click', tray.popUpContextMenu);
+  }
+
+  const menu = Menu.buildFromTemplate([
+    {
+      label: 'Quit',
+      click() { app.quit(); }
+    }
+  ]);
+
+  tray.setToolTip('Jitsi-Meet-Demo');
+  tray.setContextMenu(menu);
 });
 
 app.on('window-all-closed', function () {
