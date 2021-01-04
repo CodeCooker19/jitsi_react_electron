@@ -57,28 +57,28 @@ app.on('ready', () => {
     splash.destroy();
     mainWindow.maximize();
     mainWindow.show();
-  });
 
-  //Tray icon
-  const trayIcon = path.join(__dirname, 'images/production_mark.ico');
-  const nimage = nativeImage.createFromPath(trayIcon);
-  tray = new Tray(nimage);
-  const menu = Menu.buildFromTemplate([
-    {
-      label: 'Quit', click: function () {
-        mainWindow.destroy();
-        app.quit();
+    //Tray icon
+    const trayIcon = path.join(__dirname, 'images/production_mark.ico');
+    const nimage = nativeImage.createFromPath(trayIcon);
+    tray = new Tray(nimage);
+    const menu = Menu.buildFromTemplate([
+      {
+        label: 'Quit', click: function () {
+          mainWindow.destroy();
+          app.quit();
+        }
       }
-    }
-  ]);
-  tray.setToolTip('Jitsi-Meet-Demo');
-  tray.setContextMenu(menu);
-  tray.on('click', (event, bounds, position) => {
-    if (mainWindow.isVisible()) {
-      mainWindow.hide();
-    } else {
-      mainWindow.show();
-    }
+    ]);
+    tray.setToolTip('Jitsi-Meet-Demo');
+    tray.setContextMenu(menu);
+    tray.on('click', (event, bounds, position) => {
+      if (mainWindow.isVisible()) {
+        mainWindow.hide();
+      } else {
+        mainWindow.show();
+      }
+    });
   });
 });
 
