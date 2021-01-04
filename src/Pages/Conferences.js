@@ -73,7 +73,6 @@ const Conferences = (props) => {
     let connection = null;
     let remoteTracks = {};
     let isVideo = false;
-    // message
     const [messages, setMessages] = React.useState([]);
 
     // const options = {
@@ -89,13 +88,11 @@ const Conferences = (props) => {
     // };
 
     const options = {
-        // serviceUrl: 'wss://js1.appstractor.com/xmpp-websocket',
         hosts: {
-            domain: 'js1.appstractor.com',
-            muc: 'conference.js1.appstractor.com', // FIXME: use XEP-0030
-            // focus: 'focus.meet.jit.si',
+            domain: Str.STR_DNS_NAME,
+            muc: 'conference.' + Str.STR_DNS_NAME, // FIXME: use XEP-0030
         },
-        bosh: 'https://js1.appstractor.com/http-bind', // FIXME: use xep-0156 for that
+        bosh: 'https://' + Str.STR_DNS_NAME + '/http-bind', // FIXME: use xep-0156 for that
         clientNode: "https://jitsi.org/jitsimeet",
         useStunTurn: true
     };
@@ -125,8 +122,6 @@ const Conferences = (props) => {
             connection.addEventListener(window.JitsiMeetJS.events.connection.CONNECTION_FAILED, onConnectionFailed);
             connection.addEventListener(window.JitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, disconnect);
             connection.connect();
-
-
 
             window.JitsiMeetJS.createLocalTracks({ devices: ['audio', 'video'] })
                 .then(onLocalTracks)
