@@ -27,27 +27,29 @@ export default class VideoSmallView extends Component {
         this.setState({ overView: false });
     }
     handleClickSmallVideo() {
-        if (this.state.track !== null) {
+        if (this.state.track !== undefined) {
             this.state.track.attach($(`#mainVideo`)[0]);
+        } else {
+            $(`#mainVideo`)[0].srcObject = null;
         }
     }
 
     componentDidMount() {
-        if (this.state.track !== null) {
+        if (this.state.track !== undefined) {
             this.state.track.attach($(`#${this.state.video_tag_id}`)[0]);
         }
     }
 
     componentWillUnmount() {
-        if (this.state.track !== null) {
+        if (this.state.track !== undefined) {
             this.state.track.detach($(`#${this.state.video_tag_id}`)[0]);
         }
     }
 
     render() {
         return (
-            <div style={{ cursor: 'pointer' }} id={'div' + this.state.video_tag_id} className="root" onMouseOver={this.handleMouseOver} onMouseLeave={this.handleMouseLeave} onClick={this.handleClickSmallVideo}>
-                <video className="video" autoPlay='1' id={this.state.video_tag_id} playsInline height='150' width='200' />
+            <div style={{ cursor: 'pointer' }} id={'div' + `${this.state.video_tag_id !== undefined ? this.state.video_tag_id : ''}`} className="root" onMouseOver={this.handleMouseOver} onMouseLeave={this.handleMouseLeave} onClick={this.handleClickSmallVideo}>
+                <video className="video" autoPlay='1' id={this.state.video_tag_id !== undefined ? this.state.video_tag_id : ''} playsInline height='150' width='200' />
                 <div className="div-avatar">
                     <Avatar className="avatar">{this.state.user_name == undefined ? "" : this.state.user_name.charAt(0).toUpperCase()}</Avatar>
                 </div>
