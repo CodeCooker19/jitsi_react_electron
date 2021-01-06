@@ -15,7 +15,8 @@ import { makeArray } from 'jquery';
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'inline-flex',
-        alignItems: 'center'
+        alignItems: 'center',
+        cursor: 'pointer',
     },
     style_chat: {
         fontSize: '40px',
@@ -94,21 +95,23 @@ const ControlArea = (props) => {
 
     const onClickMic = () => {
         setMic(!mic);
+        sessionStorage.setItem('mic', !mic);
         props.onClickMic();
     }
 
-    React.useEffect(() => {
-        sessionStorage.setItem("mic", mic);
-    }, [mic]);
-    React.useEffect(() => {
-        sessionStorage.setItem("cam", cam);
-    }, [cam]);
-    setInterval(() => console.log('aaaaaaaaaaaaaaaaaaaaaaaa', sessionStorage.getItem("mic")), 1000);
-
     const onClickCam = () => {
         setCam(!cam);
+        sessionStorage.setItem('cam', !cam);
         props.onClickCamera();
     }
+    setInterval(function () {
+        if (JSON.parse(sessionStorage.getItem('mic')) !== undefined) {
+            setMic(JSON.parse(sessionStorage.getItem('mic')));
+        }
+        if (JSON.parse(sessionStorage.getItem('cam')) !== undefined) {
+            setCam(JSON.parse(sessionStorage.getItem('cam')))
+        }
+    }, 1000)
 
     return (
         <div className={classes.root}>
