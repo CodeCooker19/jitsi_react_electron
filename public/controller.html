@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <style>
+        body {
+            background-color: white;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            margin: 0px;
+        }
+
+        #root {
+            width: 100%;
+        }
+
+        .title_div {
+            display: flex;
+            justify-content: center;
+            height: 10vh;
+            align-items: center;
+        }
+
+        .title {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .list_container {
+            display: flex;
+            justify-content: center;
+            height: 70vh;
+            overflow: auto;
+        }
+
+        .item_div {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            height: 50px;
+            align-items: center;
+            margin: 0 10px;
+            background: #ece1e1;
+        }
+
+        .username_lab {
+            width: 70%;
+            margin-right: auto;
+            margin-left: auto;
+            text-align: center;
+        }
+
+        .icon_button {
+            margin-right: 5px;
+            padding: 0px;
+        }
+
+        .bnt_icon_img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .console_container {
+            display: flex;
+            justify-content: center;
+            height: 20vh;
+            background: gray;
+            align-items: center;
+        }
+
+        #inform_lab {
+            font-size: 17px;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+</head>
+
+<body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root">
+        <div class="title_div">
+            <p class="title">Controller</p>
+        </div>
+        <div class='list_container'>
+            <div class='item_div'>
+                <label class="username_lab">Me</label>
+                <button class="icon_button" id="camera_btn">
+                    <img class="bnt_icon_img" id="camera_img" src="./images/camera_on_icon.png" />
+                </button>
+                <button class="icon_button" id="mic_btn">
+                    <img class="bnt_icon_img" id="mic_img" src="./images/mic_on_icon.png" />
+                </button>
+            </div>
+        </div>
+        <div class="console_container">
+            <label id="inform_lab"></label>
+        </div>
+    </div>
+    <script type="text/javascript">
+        require('./control')
+    </script>
+</body>
+</html>
