@@ -94,22 +94,26 @@ const ControlArea = (props) => {
     const [cam, setCam] = useState(false);
 
     const onClickMic = () => {
-        setMic(!mic);
         sessionStorage.setItem('mic', !mic);
-        props.onClickMic();
+        setMic(!mic);
     }
 
     const onClickCam = () => {
+        sessionStorage.setItem('camera', !cam);
         setCam(!cam);
-        sessionStorage.setItem('cam', !cam);
-        props.onClickCamera();
     }
+    React.useEffect(() => {
+        props.onClickMic();
+    }, [mic])
+    React.useEffect(() => {
+        props.onClickCamera();
+    }, [cam])
     setInterval(function () {
-        if (JSON.parse(sessionStorage.getItem('mic')) !== undefined) {
+        if (JSON.parse(sessionStorage.getItem('mic')) !== undefined && mic != JSON.parse(sessionStorage.getItem('mic'))) {
             setMic(JSON.parse(sessionStorage.getItem('mic')));
         }
-        if (JSON.parse(sessionStorage.getItem('cam')) !== undefined) {
-            setCam(JSON.parse(sessionStorage.getItem('cam')))
+        if (JSON.parse(sessionStorage.getItem('camera')) !== undefined && cam != JSON.parse(sessionStorage.getItem('camera'))) {
+            setCam(JSON.parse(sessionStorage.getItem('camera')))
         }
     }, 1000)
 

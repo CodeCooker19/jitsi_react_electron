@@ -1,9 +1,9 @@
 const { ipcRenderer } = require('electron')
-let flagCamera = true
+let flagCamera = false
 const cameraBtn = document.getElementById('camera_btn')
 const cameraImg = document.getElementById('camera_img')
 
-let flagMic = true
+let flagMic = false
 const micBtn = document.getElementById('mic_btn')
 const micImg = document.getElementById('mic_img')
 
@@ -12,7 +12,7 @@ const consoleLabel = document.getElementById('inform_lab')
 cameraBtn.addEventListener('click', (event) => {
     let inform;
     
-    if (flagCamera == true) {
+    if (flagCamera == false) {
         cameraImg.src = "./images/camera_off_icon.png";
         inform = "Turn off camera."
     }
@@ -30,7 +30,7 @@ ipcRenderer.on('updated-camera-status', (event, index) => {
     let inform;
     flagCamera = index;
     
-    if (flagCamera == true) {
+    if (flagCamera == false) {
         cameraImg.src = "./images/camera_off_icon.png";
         inform = "Turn off camera."
     }
@@ -45,7 +45,7 @@ ipcRenderer.on('updated-camera-status', (event, index) => {
 micBtn.addEventListener('click', (event) => {
     let inform;
     
-    if (flagMic == true) {
+    if (flagMic == false) {
         micImg.src = "./images/mic_off_icon.png";
         inform = "Turn off mic."
     }
@@ -63,7 +63,7 @@ ipcRenderer.on('updated-mic-status', (event, index) => {
     let inform;
     
     flagMic = index;
-    if (flagMic == true) {
+    if (flagMic == false) {
         micImg.src = "./images/mic_off_icon.png";
         inform = "Turn off mic."
     }
