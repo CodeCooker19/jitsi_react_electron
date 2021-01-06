@@ -7,6 +7,7 @@ const isDev = require('electron-is-dev');
 const nativeImage = require('electron').nativeImage
 
 let mainWindow = null;
+let controller = null;
 let tray = null;
 
 app.on('ready', () => {
@@ -22,6 +23,22 @@ app.on('ready', () => {
   // alwaysOnTop: true,
   splash.maximize();
   splash.loadURL(`file://${__dirname}/splash.html`);
+
+  // create controller dialog
+  controller = new BrowserWindow({
+    width: 400,
+    height: 300,
+    maxWidth: 400,
+    maxHeight: 300,
+    minWidth: 400,
+    minHeight: 300,
+    title: "Controller",
+    icon: __dirname + '/images/production_mark.ico',
+    show: false
+  });
+  controller.removeMenu();
+  // mainWindow.webContents.openDevTools();
+  controller.loadURL(`file://${__dirname}/controller.html`);
 
   mainWindow = new BrowserWindow({
     width: 1200,
@@ -57,6 +74,7 @@ app.on('ready', () => {
     splash.destroy();
     mainWindow.maximize();
     mainWindow.show();
+    controller.show();
 
     //Tray icon
     const trayIcon = path.join(__dirname, 'images/production_mark.ico');
@@ -89,3 +107,26 @@ app.on('window-all-closed', function (event) {
     app.quit();
   }
 });
+
+/* 
+  init user information when user logout or exit.
+*/
+let flagMic = true;
+const { localStorage, sessionStorage } = require('electron-browser-storage');
+
+function updateUserInfo() {
+  flagMic = !flagMic;
+  mainWindow.webContents
+    .executeJavaScript('sessionStorage.getItem("mic");', true)
+    .then(result => {
+      console.log("getItem:", result);
+    });
+
+    mainWindow.webContents
+    .executeJavaScript(`sessionStorage.setItem("mic", '${flagMic}');`)
+    .then(result => {
+      console.log("setItem:", result);
+    });
+}
+
+setInterval(updateUserInfo,3000);
