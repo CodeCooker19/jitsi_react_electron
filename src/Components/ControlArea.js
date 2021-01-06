@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link as RouterLink, withRouter } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import ChatBubbleOutlineIcon from '@material-ui/icons/ChatBubbleOutline';
@@ -15,7 +15,8 @@ import { makeArray } from 'jquery';
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'inline-flex',
-        alignItems: 'center'
+        alignItems: 'center',
+        cursor: 'pointer',
     },
     style_chat: {
         fontSize: '40px',
@@ -85,7 +86,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ControlArea = (props) => {
-    const {onClickChat} = props;
+    const { onClickChat } = props;
 
     const classes = useStyles();
 
@@ -94,27 +95,37 @@ const ControlArea = (props) => {
 
     const onClickMic = () => {
         setMic(!mic);
+        sessionStorage.setItem('mic', !mic);
         props.onClickMic();
     }
 
     const onClickCam = () => {
         setCam(!cam);
+        sessionStorage.setItem('cam', !cam);
         props.onClickCamera();
     }
+    setInterval(function () {
+        if (JSON.parse(sessionStorage.getItem('mic')) !== undefined) {
+            setMic(JSON.parse(sessionStorage.getItem('mic')));
+        }
+        if (JSON.parse(sessionStorage.getItem('cam')) !== undefined) {
+            setCam(JSON.parse(sessionStorage.getItem('cam')))
+        }
+    }, 1000)
 
-    return(
+    return (
         <div className={classes.root}>
-            <ChatBubbleOutlineIcon className={classes.style_chat} onClick={()=>props.onClickChat()} />
+            <ChatBubbleOutlineIcon className={classes.style_chat} onClick={() => props.onClickChat()} />
             <div className={classes.white_circle} onClick={onClickMic} >
-                { mic ? <MicOffIcon className={classes.styles_icon_device}/> : <MicIcon className={classes.styles_icon_device}/> }
+                {mic ? <MicOffIcon className={classes.styles_icon_device} /> : <MicIcon className={classes.styles_icon_device} />}
             </div>
-            <div className={classes.red_circle} onClick={()=>props.onClickCallEnd()}>
-                <CallIcon className={classes.styles_phone_icon}/>
+            <div className={classes.red_circle} onClick={() => props.onClickCallEnd()}>
+                <CallIcon className={classes.styles_phone_icon} />
             </div>
             <div className={classes.white_circle} onClick={onClickCam} >
-                { cam ? <VideocamOffIcon className={classes.styles_icon_device}/> : <VideocamIcon className={classes.styles_icon_device}/>}
+                {cam ? <VideocamOffIcon className={classes.styles_icon_device} /> : <VideocamIcon className={classes.styles_icon_device} />}
             </div>
-            <PanToolIcon className={classes.style_hand} onClick={()=>props.onClickHand()}/>
+            <PanToolIcon className={classes.style_hand} onClick={() => props.onClickHand()} />
             {/* <ScreenShareIcon className={classes.style_screenshare} onClick={()=>props.onClickScreenShare()}/>
             <AppsIcon className={classes.style_multiview} /> */}
         </div>
