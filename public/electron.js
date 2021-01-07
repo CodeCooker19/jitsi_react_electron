@@ -4,11 +4,15 @@ const { app, BrowserWindow, Menu, Tray } = electron;
 const URL = require('url');
 const path = require('path');
 const isDev = require('electron-is-dev');
-const nativeImage = require('electron').nativeImage
+const nativeImage = require('electron').nativeImage;
+const url = require('url')
+const { ipcMain } = require('electron');
 
 let mainWindow = null;
 let controller = null;
 let tray = null;
+let cameraStatus = false;
+let micStatus = false;
 
 app.on('ready', () => {
 
@@ -26,19 +30,35 @@ app.on('ready', () => {
 
   // create controller dialog
   controller = new BrowserWindow({
-    width: 400,
-    height: 300,
-    maxWidth: 400,
-    maxHeight: 300,
-    minWidth: 400,
-    minHeight: 300,
+    width: 300,
+    height: 400,
+    maxWidth: 300,
+    maxHeight: 400,
+    minWidth: 300,
+    minHeight: 400,
     title: "Controller",
     icon: __dirname + '/images/production_mark.ico',
-    show: false
+    show: false,
+    webPreferences: {
+      nodeIntegration: true
+    }
   });
+
   controller.removeMenu();
-  // mainWindow.webContents.openDevTools();
-  controller.loadURL(`file://${__dirname}/controller.html`);
+  // controller.webContents.openDevTools();
+
+  // and load the second window.
+  controller.loadURL(url.format({
+    pathname: path.join(__dirname, 'controller.html'),
+    protocol: 'file:',
+    slashes: true
+  }))
+
+   controller.on('close', function (event) {
+    event.preventDefault();
+    controller.hide();
+    return false;
+  });
 
   mainWindow = new BrowserWindow({
     width: 1200,
@@ -47,7 +67,10 @@ app.on('ready', () => {
     minHeight: 300,
     title: "Jitsi Meet Desktop Demo",
     icon: __dirname + '/images/production_mark.ico',
-    show: false
+    show: false,
+    webPreferences: {
+      nodeIntegration: true
+    }
   });
   mainWindow.removeMenu();
   // mainWindow.webContents.openDevTools();
@@ -62,6 +85,7 @@ app.on('ready', () => {
 
     event.preventDefault();
     mainWindow.hide();
+    controller.hide();
     return false;
   });
 
@@ -75,6 +99,7 @@ app.on('ready', () => {
     mainWindow.maximize();
     mainWindow.show();
     controller.show();
+    setInterval(updateUserInfo, 1000);
 
     //Tray icon
     const trayIcon = path.join(__dirname, 'images/production_mark.ico');
@@ -84,6 +109,7 @@ app.on('ready', () => {
       {
         label: 'Quit', click: function () {
           mainWindow.destroy();
+          controller.destroy();
           app.quit();
         }
       }
@@ -93,40 +119,67 @@ app.on('ready', () => {
     tray.on('click', (event, bounds, position) => {
       if (mainWindow.isVisible()) {
         mainWindow.hide();
+        controller.hide();
       } else {
         mainWindow.show();
+        controller.show();
       }
     });
   });
+
 });
 
 app.on('window-all-closed', function (event) {
-  console.log(">>>>window-all-Closed");
   if (process.platform !== 'darwin') {
-    console.log(">>>>window-all-Closed, darwin");
     app.quit();
   }
 });
 
 /* 
-  init user information when user logout or exit.
+ *Send message to controller dialog when  when camera&mic status is changed on session storage.
 */
-let flagMic = true;
-const { localStorage, sessionStorage } = require('electron-browser-storage');
-
 function updateUserInfo() {
-  flagMic = !flagMic;
+  mainWindow.webContents
+    .executeJavaScript('sessionStorage.getItem("camera");', true)
+    .then(result => {
+      let flag = JSON.parse(result);
+      if (result != null && flag != cameraStatus) {
+        controller.webContents.send('changed-camera-status', flag);
+        cameraStatus = flag;
+      }
+    });
+
   mainWindow.webContents
     .executeJavaScript('sessionStorage.getItem("mic");', true)
     .then(result => {
-      console.log("getItem:", result);
-    });
-
-    mainWindow.webContents
-    .executeJavaScript(`sessionStorage.setItem("mic", '${flagMic}');`)
-    .then(result => {
-      console.log("setItem:", result);
+      let flag = JSON.parse(result);
+      if (result != null && flag != micStatus) {
+        controller.webContents.send('changed-mic-status', flag);
+        micStatus = flag;
+      }
     });
 }
 
-setInterval(updateUserInfo,3000);
+/**
+ *Update camera status of session storage when camera status is changed on controller dialog
+*/
+ipcMain.on('camera-update', (event, arg) => {
+  cameraStatus = arg;
+  mainWindow.webContents
+    .executeJavaScript(`sessionStorage.setItem("camera", '${arg}');`)
+    .then(result => {
+      controller.webContents.send('updated-camera-status', result);
+    });
+});
+
+/**
+ *Update mic status of session storage when mic status is changed on controller dialog
+*/
+ipcMain.on('mic-update', (event, arg) => {
+  micStatus = arg;
+  mainWindow.webContents
+    .executeJavaScript(`sessionStorage.setItem("mic", '${arg}');`)
+    .then(result => {
+      controller.webContents.send('updated-mic-status', result);
+    });
+});
