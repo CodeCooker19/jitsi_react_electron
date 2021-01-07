@@ -1,9 +1,11 @@
 const { ipcRenderer } = require('electron')
 let flagCamera = false
+let lockCamera = false
 const cameraBtn = document.getElementById('camera_btn')
 const cameraImg = document.getElementById('camera_img')
 
 let flagMic = false
+let lockMic = false
 const micBtn = document.getElementById('mic_btn')
 const micImg = document.getElementById('mic_img')
 
@@ -11,8 +13,10 @@ const consoleLabel = document.getElementById('inform_lab')
 /* camera update*/
 cameraBtn.addEventListener('click', (event) => {
     let inform;
-    
-    if (flagCamera == false) {
+    lockCamera = true;
+    flagCamera = !flagCamera;
+
+    if (flagCamera == true) {
         cameraImg.src = "./images/camera_off_icon.png";
         inform = "Turn off camera."
     }
@@ -22,15 +26,24 @@ cameraBtn.addEventListener('click', (event) => {
     }
     consoleLabel.innerHTML = inform;
     
-    flagCamera = !flagCamera;
     ipcRenderer.send('camera-update', flagCamera)
 })
 
+/* camera updated*/
 ipcRenderer.on('updated-camera-status', (event, index) => {
+    lockCamera = false;
+})
+
+/* camera updated by conference dialog*/
+ipcRenderer.on('changed-camera-status', (event, index) => {
+    if(lockCamera == true) {
+        return;
+    }
+
     let inform;
     flagCamera = index;
     
-    if (flagCamera == false) {
+    if (flagCamera == true) {
         cameraImg.src = "./images/camera_off_icon.png";
         inform = "Turn off camera."
     }
@@ -45,7 +58,9 @@ ipcRenderer.on('updated-camera-status', (event, index) => {
 micBtn.addEventListener('click', (event) => {
     let inform;
     
-    if (flagMic == false) {
+    lockMic = true;
+    flagMic = !flagMic;
+    if (flagMic == true) {
         micImg.src = "./images/mic_off_icon.png";
         inform = "Turn off mic."
     }
@@ -55,15 +70,24 @@ micBtn.addEventListener('click', (event) => {
     }
     consoleLabel.innerHTML = inform;
 
-    flagMic = !flagMic;
     ipcRenderer.send('mic-update', flagMic)
 })
 
+/* mic updated*/
 ipcRenderer.on('updated-mic-status', (event, index) => {
+    lockMic = false;
+})
+
+/* mic updated by conference dialog*/
+ipcRenderer.on('changed-mic-status', (event, index) => {
+    if(lockMic == true) {
+        return;
+    }
+
     let inform;
     
     flagMic = index;
-    if (flagMic == false) {
+    if (flagMic == true) {
         micImg.src = "./images/mic_off_icon.png";
         inform = "Turn off mic."
     }

@@ -11,6 +11,8 @@ const { ipcMain } = require('electron');
 let mainWindow = null;
 let controller = null;
 let tray = null;
+let cameraStatus = false;
+let micStatus = false;
 
 app.on('ready', () => {
 
@@ -52,14 +54,7 @@ app.on('ready', () => {
     slashes: true
   }))
 
-  // Attach event listener to event that requests to update something in the second window
-  // from the first window
-  ipcMain.on('request-update-label-in-second-window', (event, arg) => {
-    // Request to update the label in the renderer process of the second window
-    console.log(arg);
-  });
-
-  controller.on('close', function (event) {
+   controller.on('close', function (event) {
     event.preventDefault();
     controller.hide();
     return false;
@@ -104,7 +99,7 @@ app.on('ready', () => {
     mainWindow.maximize();
     mainWindow.show();
     controller.show();
-    setInterval(updateUserInfo, 3000);
+    setInterval(updateUserInfo, 1000);
 
     //Tray icon
     const trayIcon = path.join(__dirname, 'images/production_mark.ico');
@@ -141,34 +136,50 @@ app.on('window-all-closed', function (event) {
 });
 
 /* 
-  init user information when user logout or exit.
+ *Send message to controller dialog when  when camera&mic status is changed on session storage.
 */
 function updateUserInfo() {
   mainWindow.webContents
     .executeJavaScript('sessionStorage.getItem("camera");', true)
     .then(result => {
-      console.log("camera value:", result);
+      let flag = JSON.parse(result);
+      if (result != null && flag != cameraStatus) {
+        controller.webContents.send('changed-camera-status', flag);
+        cameraStatus = flag;
+      }
     });
 
   mainWindow.webContents
     .executeJavaScript('sessionStorage.getItem("mic");', true)
     .then(result => {
-      console.log("mic value:", result);
+      let flag = JSON.parse(result);
+      if (result != null && flag != micStatus) {
+        controller.webContents.send('changed-mic-status', flag);
+        micStatus = flag;
+      }
     });
 }
 
+/**
+ *Update camera status of session storage when camera status is changed on controller dialog
+*/
 ipcMain.on('camera-update', (event, arg) => {
-  // Request to update the label in the renderer process of the second window
+  cameraStatus = arg;
   mainWindow.webContents
     .executeJavaScript(`sessionStorage.setItem("camera", '${arg}');`)
     .then(result => {
+      controller.webContents.send('updated-camera-status', result);
     });
 });
 
+/**
+ *Update mic status of session storage when mic status is changed on controller dialog
+*/
 ipcMain.on('mic-update', (event, arg) => {
-  // Request to update the label in the renderer process of the second window
+  micStatus = arg;
   mainWindow.webContents
     .executeJavaScript(`sessionStorage.setItem("mic", '${arg}');`)
     .then(result => {
+      controller.webContents.send('updated-mic-status', result);
     });
 });
